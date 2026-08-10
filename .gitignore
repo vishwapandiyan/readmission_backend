@@ -54,6 +54,7 @@ env/
 htmlcov/
 
 # ML Models (if large)
+# Note: We're including the model file for deployment
 # *.pkl
 # *.h5
 # *.pt

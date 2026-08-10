@@ -59,8 +59,15 @@ model_loader = ModelLoader()
 
 # Auto-load the model on startup
 try:
-    project_root = Path(__file__).parent.parent.parent.parent
-    model_path = project_root / "best_model.pkl"
+    # Try backend directory first (for deployment)
+    backend_dir = Path(__file__).parent.parent.parent
+    model_path = backend_dir / "best_model.pkl"
+    
+    # If not found in backend dir, try parent directory (for development)
+    if not model_path.exists():
+        project_root = backend_dir.parent
+        model_path = project_root / "best_model.pkl"
+    
     if model_path.exists():
         model_loader.load_comprehensive_system(str(model_path))
         print("✓ Model auto-loaded on startup")
