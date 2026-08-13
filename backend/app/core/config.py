@@ -1,6 +1,7 @@
 """
 Configuration settings
 """
+# pyrefly: ignore [missing-import]
 from pydantic_settings import BaseSettings
 from typing import List
 
@@ -60,6 +61,27 @@ class Settings(BaseSettings):
     LLM_ENABLED: bool = True
     LLM_TEMPERATURE: float = 0.7
     LLM_MAX_TOKENS: int = 2048
+    
+    # EHR Integration Settings (HL7 v2 & SMART on FHIR)
+    EHR_ENABLED: bool = True
+    HL7_RECEIVING_APPLICATION: str = "READMISSION_AI"
+    HL7_RECEIVING_FACILITY: str = "HOSPITAL_SYS"
+    FHIR_DEFAULT_SERVER_URL: str = "https://launch.smarthealthit.org/v/r4/fhir"
+    FHIR_CLIENT_ID: str = "readmission-risk-predictor"
+    FHIR_SCOPE: str = "patient/*.read launch/patient online_access openid profile"
+    
+    # Meta WhatsApp Cloud API Settings
+    WHATSAPP_API_TOKEN: str = ""           # Meta Graph API Token (from developers.facebook.com)
+    WHATSAPP_PHONE_NUMBER_ID: str = ""     # Meta WhatsApp Phone Number ID
+    WHATSAPP_VERIFY_TOKEN: str = "readmission_whatsapp_verify_token"  # Secret token for Meta Webhook verification
+    WHATSAPP_API_VERSION: str = "v18.0"
+    WHATSAPP_ENABLED: bool = True
+    AGENT_NAME: str = "CarePath AI"
+    HOSPITAL_NAME: str = "General Hospital Post-Care Team"
+
+
+
+
 
 
 settings = Settings()

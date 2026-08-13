@@ -409,6 +409,67 @@ Clinical Decision
 
 ---
 
+---
+
+## EHR Interoperability (HL7 v2 & SMART on FHIR)
+
+The system includes native adapters for major Hospital EHR systems (Epic, Cerner, MEDITECH, Allscripts):
+
+### 1. HL7 v2 ADT Integration
+- **Supported Messages:** `ADT^A01` (Admit), `ADT^A02` (Transfer), `ADT^A03` (Discharge), `ADT^A08` (Update)
+- **Parsed Segments:** `MSH`, `PID`, `PV1`, `DG1` (ICD-10 condition mapping), `OBX` (LOINC lab values)
+- **Automatic ACK:** Returns standard HL7 v2 `ACK^A03` acknowledgement (`MSA|AA|...`)
+- **Endpoint:** `POST /api/v1/ehr/hl7/adt` | `GET /api/v1/ehr/hl7/sample-adt`
+
+### 2. SMART on FHIR R4 Integration
+- **SMART Discovery:** `/.well-known/smart-configuration` & `GET /api/v1/ehr/fhir/.well-known/smart-configuration`
+- **CapabilityStatement:** `GET /api/v1/ehr/fhir/metadata`
+- **FHIR Resource Sync:** Direct connection to external FHIR servers (`Patient`, `Encounter`, `Condition`, `Observation`, `MedicationRequest`)
+- **FHIR RiskAssessment Output:** Returns LOINC `98254-6` formatted `RiskAssessment` resources
+- **CDS Hooks:** Real-time discharge decision cards via `POST /api/v1/ehr/cds-services/patient-discharge`
+- **SMART App Launch:** `GET /api/v1/ehr/smart/launch` for embedded EHR iFrame launch
+
+---
+
+## Post-Care AI WhatsApp Follow-Up Agent (Groq API + Meta WhatsApp Cloud API)
+
+Automates personalized disease-specific post-discharge follow-ups for **High-Risk Patients** (Heart Failure, Diabetes, COPD, CKD, Hypertension, etc.):
+
+```
+High-Risk Patient (Name, Phone, Disease) 
+   │
+   ▼
+Groq AI Engine (Llama 3.1) ──► Personalized Disease-Specific Guidance
+   │
+   ▼
+Meta WhatsApp Cloud API ──────► Patient's WhatsApp
+   │
+   ▼ (Patient Replies on WhatsApp)
+Groq Symptom Triager ─────────► SAFE / WARNING / CRITICAL_EMERGENCY
+```
+
+### Features:
+- **Patient Features Ingested:** `name`, `phone_number`, `disease`, `medications`, `risk_score`.
+- **Disease-Targeted Protocol:**
+  - **Heart Failure:** Daily morning weight log, orthopnea checks, leg edema, low-sodium guidance.
+  - **Type 2 Diabetes:** Fasting & post-meal blood glucose tracking, insulin compliance, hypoglycemia safety.
+  - **COPD:** Inhaler technique, sputum color/volume monitoring, breathlessness scales.
+  - **Chronic Kidney Disease (CKD):** Urine output tracking, fluid restrictions, avoiding NSAIDs.
+- **Symptom Triage & Red-Flag Detection:**
+  - `CRITICAL_EMERGENCY`: Immediate 911 / emergency directive + Care team alert.
+  - `WARNING_MONITOR`: At-home safety guidance + nurse callback flag.
+  - `SAFE`: Positive adherence reinforcement and reassurance.
+- **Meta WhatsApp Cloud API Webhook:**
+  - `GET /api/v1/agent/whatsapp/webhook` (Meta challenge verification handshake)
+  - `POST /api/v1/agent/whatsapp/webhook` (Live inbound patient WhatsApp messages)
+- **Endpoints:**
+  - `POST /api/v1/agent/enroll` (Enroll patient & send first disease-specific check-in)
+  - `POST /api/v1/agent/trigger-followup` (Trigger Day 1/3/7/14/30 milestone check-ins)
+  - `POST /api/v1/agent/chat` (Interactive simulation & chat testing)
+  - `GET /api/v1/agent/sessions` (View all active outreach sessions)
+
+---
+
 ## License
 
 This system is provided for healthcare and research purposes.
@@ -425,7 +486,9 @@ For questions or issues:
 
 ---
 
-**Last Updated:** August 10, 2026  
+**Last Updated:** August 13, 2026  
 **Model Version:** 1.0 (Logistic Regression)  
-**System Status:** Production-Ready ✅  
+**System Status:** Production-Ready (EHR HL7 v2 + SMART on FHIR + Post-Care AI WhatsApp Agent) ✅  
 **Performance:** 93.3% AUC | 90.6% Accuracy | Top 5% of published models
+
+

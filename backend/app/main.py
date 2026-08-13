@@ -1,7 +1,7 @@
 """
 FastAPI Application - Hospital Readmission Prediction System
 """
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from datetime import datetime
@@ -111,6 +111,15 @@ async def health_check():
 
 # Include API router
 app.include_router(api_router, prefix="/api/v1")
+
+
+@app.get("/.well-known/smart-configuration", tags=["SMART on FHIR"])
+async def smart_configuration_root(request: Request):
+    """Root SMART on FHIR discovery endpoint required by SMART IG standard"""
+    from app.services.fhir_service import fhir_service
+    base_url = str(request.base_url).rstrip("/")
+    return fhir_service.get_smart_configuration(base_url)
+
 
 
 # Exception handlers

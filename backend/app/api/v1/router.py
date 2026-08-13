@@ -2,7 +2,7 @@
 API v1 router
 """
 from fastapi import APIRouter
-from app.api.v1.endpoints import predictions, interventions, auth, patients, care
+from app.api.v1.endpoints import predictions, interventions, auth, patients, care, ehr, agent
 
 api_router = APIRouter()
 
@@ -36,3 +36,17 @@ api_router.include_router(
     prefix="/care",
     tags=["Care Coordination"]
 )
+
+api_router.include_router(
+    ehr.router,
+    prefix="/ehr",
+    tags=["EHR Interoperability (HL7 v2 & SMART on FHIR)"]
+)
+
+api_router.include_router(
+    agent.router,
+    prefix="/agent",
+    tags=["Post-Care AI Agent (WhatsApp & Meta API)"]
+)
+
+
